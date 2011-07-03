@@ -15,7 +15,8 @@ def get_config_schema():
 
         Switch("CUDA_TRACE", False, "Enable CUDA API tracing"),
         Option("CUDA_ROOT", help="Path to the CUDA toolkit"),
-        Option("CUDA_PRETEND_VERSION", help="Assumed CUDA version, in the form 3010 for 3.1."),
+        Option("CUDA_PRETEND_VERSION",
+               help="Assumed CUDA version, in the form 3010 for 3.1."),
         IncludeDir("CUDA", None),
 
         Switch("CUDA_ENABLE_GL", False, "Enable CUDA GL interoperability"),
@@ -65,7 +66,8 @@ def verify_path(description, paths, names, extensions, subpaths=['/'],
                     for name in names:
                         for extension in extensions:
                             print(path, subpath, prefix, name, extension)
-                            filename = path + subpath + prefix + name + extension
+                            filename = path + subpath + prefix + name + \
+                                    extension
 
                             looked_where.append(filename)
 
@@ -83,8 +85,6 @@ def verify_path(description, paths, names, extensions, subpaths=['/'],
                 % description)
 
 
-
-
 def verify_siteconfig(sc_vars):
     LIB_EXTS = ['.so', '.dylib', '.lib']
     LIB_PREFIXES = ['lib']
@@ -93,16 +93,17 @@ def verify_siteconfig(sc_vars):
 
     # BOOST_INC_DIR/boost/python.hpp
     if 'BOOST_INC_DIR' in sc_vars:
-        verify_path (
+        verify_path(
             description="Boost headers",
             paths=sc_vars['BOOST_INC_DIR'],
             subpaths=['/boost/'],
             names=['python'],
             extensions=['.hpp']
-            );
+            )
     else:
-        print(warn_prefix + 'BOOST_INC_DIR is not set, should be something like '
-                '"/path/to/boost/include/boost-1_39".')
+        print(warn_prefix + 'BOOST_INC_DIR is not set, '
+              'should be something like'
+              '"/path/to/boost/include/boost-1_39".')
 
     # BOOST_LIB_DIR/(lib)?BOOST_PYTHON_LIBNAME(.so|.dylib|?Windows?)
     if 'BOOST_LIB_DIR' not in sc_vars:
@@ -111,7 +112,7 @@ def verify_siteconfig(sc_vars):
                 '"/include/boost-1_39".')
 
     if 'BOOST_PYTHON_LIBNAME' in sc_vars:
-        verify_path (
+        verify_path(
             description="Boost Python library",
             paths=sc_vars['BOOST_LIB_DIR'],
             names=sc_vars['BOOST_PYTHON_LIBNAME'],
@@ -150,7 +151,7 @@ def verify_siteconfig(sc_vars):
 
     # CUDA_INC_DIR/cuda.h
     if 'CUDA_INC_DIR' in sc_vars:
-        verify_path (
+        verify_path(
             description="CUDA include directory",
             paths=sc_vars['CUDA_INC_DIR'],
             names=['cuda'],
@@ -166,7 +167,7 @@ def verify_siteconfig(sc_vars):
                 'be something like CUDA_ROOT + "/lib".')
 
     if 'CUDADRV_LIBNAME' in sc_vars:
-        verify_path (
+        verify_path(
             description="CUDA driver library",
             paths=sc_vars['CUDADRV_LIB_DIR'],
             names=sc_vars['CUDADRV_LIBNAME'],
@@ -175,17 +176,19 @@ def verify_siteconfig(sc_vars):
             maybe_ok=True,
             )
     else:
-        print(warn_prefix + 'CUDADRV_LIBNAME is not set, should most likely be "cuda".')
+        print(warn_prefix + 'CUDADRV_LIBNAME is not set, '
+              'should most likely be "cuda".')
 
     # CUDART_LIB_DIR=(lib)?CUDART_LIBNAME(.so|.dylib|?Windows?)
     if not 'CUDART_LIB_DIR' in sc_vars:
         # Since libcurand.so is distributed in the CUDA Runtime lib directory.
-        # which is different from the CUDA Driver lib directory, we should check.
+        # which is different from the CUDA Driver lib directory, we should
+        # check.
         print(warn_prefix + 'CUDART_LIB_DIR is not set, should '
                 'be sometthing like CUDA_ROOT + "/lib".')
 
     if 'CUDART_LIBNAME' in sc_vars:
-        verify_path (
+        verify_path(
             description="CUDA runtime library",
             paths=sc_vars['CUDART_LIB_DIR'],
             names=sc_vars['CUDART_LIBNAME'],
@@ -250,11 +253,11 @@ def main():
         EXTRA_DEFINES["CUDAPP_TRACE_CUDA"] = 1
 
     if conf["CUDA_PRETEND_VERSION"]:
-        EXTRA_DEFINES["CUDAPP_PRETEND_CUDA_VERSION"] = conf["CUDA_PRETEND_VERSION"]
+        EXTRA_DEFINES["CUDAPP_PRETEND_CUDA_VERSION"] = \
+                conf["CUDA_PRETEND_VERSION"]
 
     INCLUDE_DIRS = ['src/cpp'] + conf["BOOST_INC_DIR"] + conf["CUDA_INC_DIR"]
     conf["USE_CUDA"] = True
-
 
     if 'darwin' in sys.platform and sys.maxsize == 2147483647:
         # The Python interpreter is running in 32 bit mode on OS X
@@ -281,7 +284,8 @@ def main():
         EXTRA_LIBRARIES.append("curand")
 
     ver_dic = {}
-    exec(compile(open("pycuda/__init__.py").read(), "pycuda/__init__.py", 'exec'), ver_dic)
+    exec(compile(open("pycuda/__init__.py").read(),
+                 "pycuda/__init__.py", 'exec'), ver_dic)
 
     try:
         from distutils.command.build_py import build_py_2to3 as build_py
